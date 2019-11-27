@@ -1,0 +1,22 @@
+version: '3'
+services:
+  servdb:
+    restart: always
+    image: postgres:latest
+    container_name: pgcontainer
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=db1
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  golang:
+    restart: always
+    container_name: gocontainer
+    build: .
+    ports:
+     - "8080:8080"      
+
+

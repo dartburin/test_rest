@@ -1,0 +1,10 @@
+# code file
+rest
+go.mod
+Makefile
+
+*.txt
+
+.vscode/*
+data/*
+
