@@ -1,6 +1,7 @@
 # code file
 rest
 go.mod
+go.sum
 Makefile
 
 *.txt
