@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	pdb "test_rest/postgredb"
 )
@@ -12,8 +13,19 @@ func main() {
 		User: "postgres",
 		Pass: "postgres",
 		Db:   "books",
-		Host: "127.0.0.1",
+		Host: "localhost",
+		//		Host: "127.0.0.1",
+		//		Host: "servdb",
 		Port: "5432",
+	}
+
+	hostName := flag.String("host", "", "a host name")
+	flag.Parse()
+
+	// Check existing host name param
+	if *hostName != "" {
+		config.Host = *hostName
+		fmt.Printf("Set postgreSQL server host = %v \n", *hostName)
 	}
 
 	parDB, err := pdb.ConnectToDB(config)

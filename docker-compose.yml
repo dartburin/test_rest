@@ -11,12 +11,24 @@ services:
     volumes:
       - /tmp/data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
+    networks:
+      - dockernet
+
   golang:
     restart: always
     container_name: gocontainer
     build: .
     ports:
-     - "8080:8080"      
+      - "5432"
+      - "8080:8080"  
+    networks:
+      - dockernet
+
+networks:
+  dockernet:
+    driver: bridge
+          
+
 
 
