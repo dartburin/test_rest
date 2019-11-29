@@ -23,12 +23,19 @@ type Config struct {
 	Port string
 }
 
+// Book info
+type Book struct {
+	Id     int64
+	Author string
+	Title  string
+}
+
 // Creae connection to db
 func ConnectToDB(conf Config) (ParamDB, error) {
+	var err error = nil
 	var par ParamDB
 	par.Conf = conf
 	par.Base = nil
-	err := errors.New("No error.")
 
 	if conf.User == "" || conf.Pass == "" || conf.Db == "" ||
 		conf.Host == "" || conf.Port == "" {
@@ -96,21 +103,15 @@ func (par *ParamDB) Close() (err error) {
 
 // Check user database exists and create if need
 func checkExistsUserDB(base *sql.DB, name string) error {
-	queue := fmt.Sprintf("select count(*) from pg_database where datname = '%s';", name)
+	queue := fmt.Sprintf("SELECT COUNT(*) FROM pg_database WHERE datname = '%s';", name)
 
-	rows, err := base.Query(queue)
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
+	row := base.QueryRow(queue)
 
 	var cnt int
-	for rows.Next() {
-		if err := rows.Scan(&cnt); err != nil {
-			panic(err)
-		}
-		break
+	if err := row.Scan(&cnt); err != nil {
+		panic(err)
 	}
+
 	if cnt != 1 {
 		return errors.New("No base")
 	}
@@ -148,8 +149,8 @@ func createDB(conf Config, base *sql.DB) (ParamDB, error) {
 func createBookTable(base *sql.DB) error {
 	_, err := base.Exec("CREATE TABLE IF NOT EXISTS BookInfo(" +
 		"id SERIAL PRIMARY KEY," +
-		"name varchar(50)," +
-		"autor varchar(50)" +
+		"title varchar(50)," +
+		"author varchar(50)" +
 		");")
 
 	if err != nil {
@@ -175,4 +176,103 @@ func openDB(confstr string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+// Insert book info into database
+func (b *Book) InsertBook(base *sql.DB) (int64, error) {
+	if base == nil {
+		return 0, errors.New("DB not opened")
+	}
+
+	query := fmt.Sprintf("INSERT INTO BookInfo (title, author) VALUES('%s', '%s') RETURNING id;", b.Title, b.Author)
+	row := base.QueryRow(query)
+
+	var id int64
+	if err := row.Scan(&id); err != nil {
+		return 0, errors.New("Error insert book - bad id")
+	}
+	return id, nil
+}
+
+// Insert book info into database
+func (b *Book) DeleteBook(base *sql.DB) error {
+	if base == nil {
+		return errors.New("DB not opened")
+	}
+
+	if b.Id <= 0 {
+		return errors.New("Id not set")
+	}
+
+	query := fmt.Sprintf("DELETE FROM BookInfo where id = %v;", b.Id)
+	_, err := base.Exec(query)
+
+	if err != nil {
+		return errors.New("Error delete book")
+	}
+	return nil
+}
+
+// Update book info into database
+func (b *Book) UpdateBook(base *sql.DB) error {
+	if base == nil {
+		return errors.New("DB not opened")
+	}
+
+	if b.Id <= 0 {
+		return errors.New("Id not set")
+	}
+
+	var query string
+	switch {
+	case b.Author != "" && b.Title != "":
+		query = fmt.Sprintf("UPDATE BookInfo SET author = '%s', title = '%s' WHERE id = %v;", b.Author, b.Title, b.Id)
+	case b.Author != "":
+		query = fmt.Sprintf("UPDATE BookInfo SET author = '%s' WHERE id = %v;", b.Author, b.Id)
+	case b.Title != "":
+		query = fmt.Sprintf("UPDATE BookInfo SET title = '%s' WHERE id = %v;", b.Title, b.Id)
+	default:
+		return nil
+	}
+
+	_, err := base.Exec(query)
+
+	if err != nil {
+		return errors.New("Error update book")
+	}
+	return nil
+}
+
+// Select book info from database
+func (b *Book) SelectBook(base *sql.DB) (*[]Book, error) {
+	bb := make([]Book, 0)
+	if base == nil {
+		return &bb, errors.New("DB not opened")
+	}
+
+	var query string
+	if b.Id > 0 {
+		query = fmt.Sprintf("SELECT id, title, author FROM BookInfo WHERE id = %v;", b.Id)
+	} else {
+		query = fmt.Sprintf("SELECT id, title, author FROM BookInfo;")
+	}
+
+	rows, err := base.Query(query)
+	if err != nil {
+		return &bb, errors.New("Select error")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var book Book
+		if err := rows.Scan(&book.Id, &book.Title, &book.Author); err != nil {
+			return &bb, errors.New("Select scan error")
+		}
+		bb = append(bb, book)
+	}
+
+	if err != nil {
+		return &bb, errors.New("Error update book")
+	}
+	return &bb, nil
 }

@@ -16,13 +16,62 @@ func main() {
 		Port: "5432",
 	}
 
-	param, err := pdb.ConnectToDB(config)
+	parDB, err := pdb.ConnectToDB(config)
 	if err != nil {
 		return
 	}
+	defer parDB.Base.Close()
 
-	fmt.Printf("Connect ! %v \n\n", param)
-	param.Base.Close()
+	fmt.Printf("Connect ! %v \n\n", parDB)
 
-	fmt.Println("RESTful service end !!!\n")
+	//insert test
+	bb := pdb.Book{
+		Id:     0,
+		Title:  "Best book 1",
+		Author: "Good author 1",
+	}
+	id, err := bb.InsertBook(parDB.Base)
+	fmt.Printf("Book inserted %v (err = %v) !!!\n", id, err)
+
+	bb.Title = "Best book 2"
+	bb.Author = "Good author 2"
+	id, err = bb.InsertBook(parDB.Base)
+	fmt.Printf("Book inserted %v (err = %v) !!!\n", id, err)
+	toDel := id
+
+	bb.Title = "Best book 3"
+	bb.Author = "Good author 3"
+	id, err = bb.InsertBook(parDB.Base)
+	fmt.Printf("Book inserted %v (err = %v) !!!\n", id, err)
+	toSel := id
+
+	bb.Title = "Best book 4"
+	bb.Author = "Good author 4"
+	id, err = bb.InsertBook(parDB.Base)
+	fmt.Printf("Book inserted %v (err = %v) !!!\n", id, err)
+	toUpd := id
+
+	//delete test
+	bb.Id = toDel
+	err = bb.DeleteBook(parDB.Base)
+	fmt.Printf("Book deleted (err = %v) !!!\n", err)
+
+	//update test
+	bb.Id = toUpd
+	bb.Author = "Very best author"
+	bb.Title = "111"
+	err = bb.UpdateBook(parDB.Base)
+	fmt.Printf("Book updated (err = %v) !!!\n\n", err)
+
+	//select one test
+	bb.Id = toSel
+	books, err := bb.SelectBook(parDB.Base)
+	fmt.Printf("Book one select \n%v (err = %v) !!!\n\n", books, err)
+
+	//select lot test
+	bb.Id = 0
+	books, err = bb.SelectBook(parDB.Base)
+	fmt.Printf("Books lot select \n%v (err = %v) !!!\n\n", books, err)
+
+	fmt.Printf("RESTful service end !!!\n")
 }
