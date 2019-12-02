@@ -16,6 +16,7 @@ COPY go.sum ./
 
 COPY ./rest.go ./
 COPY ./postgredb ./postgredb/
+COPY ./servhttp ./servhttp/
 
 RUN ls -l
 RUN pwd

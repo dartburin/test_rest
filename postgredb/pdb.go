@@ -234,7 +234,7 @@ func (b *Book) UpdateBook(base *sql.DB) error {
 	default:
 		return nil
 	}
-
+	fmt.Println(query)
 	_, err := base.Exec(query)
 
 	if err != nil {
@@ -252,9 +252,9 @@ func (b *Book) SelectBook(base *sql.DB) (*[]Book, error) {
 
 	var query string
 	if b.Id > 0 {
-		query = fmt.Sprintf("SELECT id, title, author FROM BookInfo WHERE id = %v;", b.Id)
+		query = fmt.Sprintf("SELECT id, title, author FROM BookInfo WHERE id = %v ORDER BY id;", b.Id)
 	} else {
-		query = fmt.Sprintf("SELECT id, title, author FROM BookInfo;")
+		query = fmt.Sprintf("SELECT id, title, author FROM BookInfo ORDER BY id;")
 	}
 
 	rows, err := base.Query(query)
