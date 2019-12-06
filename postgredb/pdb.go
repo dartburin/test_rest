@@ -14,7 +14,7 @@ type ParamDB struct {
 	Base *sql.DB
 }
 
-// Data for configuration DB connecttion
+// Data for configuration of DB connecttion
 type Config struct {
 	User string
 	Pass string
@@ -30,7 +30,7 @@ type Book struct {
 	Title  string
 }
 
-// Creae connection to db
+// Create connection to db
 func ConnectToDB(conf Config) (ParamDB, error) {
 	var err error = nil
 	var par ParamDB
