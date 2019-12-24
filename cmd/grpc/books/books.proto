@@ -1,0 +1,77 @@
+syntax = "proto3";
+package books;
+
+import "google/api/annotations.proto";
+
+// The library service definition.
+service Library {
+    rpc GetBooks(GetBookRequest) returns (Books) {
+        option (google.api.http) = {
+          get: "/books"
+        };
+    }
+
+    rpc UpdateBook(UpdateBookRequest) returns (OneBook) {
+        option (google.api.http) = {
+          put: "/books/{BookId}"
+          body: "Message"
+        };
+    }
+
+    rpc PathBook(UpdateBookRequest) returns (OneBook) {
+        option (google.api.http) = {
+          patch: "/books/{BookId}"
+          body: "Message"
+        };
+    }
+
+    rpc DeleteBook(DeleteBookRequest) returns (Result) {
+        option (google.api.http) = {
+          delete: "/books/{BookId}"
+        };
+    }
+
+    rpc PostBook(PostBookRequest) returns (OneBook) {
+        option (google.api.http) = {
+          post: "/books"
+          body: "Message"
+        };
+    }
+}
+  
+
+message Result {
+	string Rez = 1;  
+}
+
+message OneBook {
+	int64 Id = 1;    
+	string Author = 2; 
+	string Title = 3;  
+}
+
+message Books {
+    repeated OneBook Books = 1;
+}
+
+message BookData {
+	string Author = 1; 
+	string Title = 2;  
+}
+
+message UpdateBookRequest {
+    string BookId = 1; 
+    BookData Message = 2;   
+}
+
+message DeleteBookRequest {
+    string BookId = 1; 
+}
+
+message PostBookRequest {
+    BookData Message = 1;   
+}
+
+message GetBookRequest {
+    string Buff = 1;   
+}

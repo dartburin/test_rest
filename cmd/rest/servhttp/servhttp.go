@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	pdb "test_rest/postgredb"
+	pdb "test_rest/cmd/rest/postgredb"
 
 	"github.com/gorilla/mux"
 )

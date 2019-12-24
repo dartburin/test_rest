@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	pdb "test_rest/postgredb"
-	rest "test_rest/servhttp"
+	pdb "test_rest/cmd/rest/postgredb"
+	rest "test_rest/cmd/rest/servhttp"
 )
 
 func main() {

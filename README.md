@@ -1,6 +1,11 @@
 # test_rest
 Simple RESTful API application for work with PostgreSQL DB.
 
+(Local start)
+server:  go build cmd/grpc/main.go
+./main   -dbbase=books  -dbhost=servdb  -dbpass=postgres  -dbport=5432  -dbuser=postgres   -httphost=0.0.0.0  -httpport=8080
+
+
 (START)
 docker-compose up --build
 

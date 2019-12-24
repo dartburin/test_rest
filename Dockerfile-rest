@@ -31,11 +31,6 @@ COPY go.mod ./
 COPY go.sum ./
 
 COPY ./cmd ./
-COPY ./cmd/grpc/ ./cmd/
-COPY ./cmd/grpc/* ./cmd/grpc/
-COPY ./cmd/grpc/servgrpc/* ./cmd/grpc/servgrpc/
-COPY ./cmd/grpc/books/* ./cmd/grpc/books/
-
 COPY ./cmd/rest/ ./cmd/
 COPY ./cmd/rest/* ./cmd/rest/
 COPY ./cmd/rest/postgredb/* ./cmd/rest/postgredb/
@@ -45,9 +40,7 @@ COPY ./cmd/rest/servhttp/* ./cmd/rest/servhttp/
 #RUN pwd
 
 RUN go mod download 
-#RUN protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out=plugins=grpc:. cmd/grpc/books/books.proto
-#RUN protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --grpc-gateway_out=logtostderr=true:. cmd/grpc/books/books.proto
-RUN go build cmd/grpc/main.go
+RUN go build cmd/rest/main.go
 RUN ls -l
 
 EXPOSE ${HTTP_PORT}
